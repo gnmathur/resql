@@ -1,3 +1,5 @@
+[![Java CI with Maven](https://github.com/gnmathur/resql/actions/workflows/maven.yml/badge.svg?branch=main)](https://github.com/gnmathur/resql/actions/workflows/maven.yml)
+
 # resql
 A Java library for translating custom query grammar into target DB where clauses
 

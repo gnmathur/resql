@@ -39,7 +39,5 @@ public class PgTest {
 
     @Test
     public void testThis() {
-        LOGGER.info(postgreSQLContainer.getExposedPorts().toString());
-        LOGGER.info(postgreSQLContainer.getDatabaseName());
     }
 }
