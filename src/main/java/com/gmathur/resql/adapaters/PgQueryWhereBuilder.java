@@ -60,7 +60,6 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
                     .append(" AND ")
                     .append(chkAndExtractStr(expressions.get(ctx.subexp(1))));
             expressions.put(ctx, StringWrapperBldr(q.toString()));
-            logger.info(q.toString());
         } else if (ctx.OR() != null) {
             final StringBuilder q = new StringBuilder();
             q
@@ -68,7 +67,6 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
                     .append(" OR ")
                     .append(chkAndExtractStr(expressions.get(ctx.subexp(1))));
             expressions.put(ctx, StringWrapperBldr(q.toString()));
-            logger.info(q.toString());
         } else if (ctx.OPENPAREN() != null && ctx.CLOSEPAREN() != null) {
             expressions.put(ctx, StringWrapperBldr("(" + chkAndExtractStr(expressions.get(ctx.subexp(0))) + ")"));
         } else if (ctx.gtexp() != null) {
@@ -93,7 +91,6 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
         StringBuffer q = new StringBuffer();
         q.append(ctx.FIELD().getText()) .append(" > ") .append(ctx.NUMBER().getText());
         expressions.put(ctx, StringWrapperBldr(q.toString()));
-        logger.info(q.toString());
     }
 
     @Override
@@ -105,7 +102,6 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
         StringBuffer q = new StringBuffer();
         q.append(ctx.FIELD().getText()).append(" < ").append(ctx.NUMBER().getText());
         expressions.put(ctx, StringWrapperBldr(q.toString()));
-        logger.info(q.toString());
     }
 
     @Override
@@ -117,7 +113,6 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
         StringBuffer q = new StringBuffer();
         q.append(ctx.FIELD().getText()).append(" <= ").append(ctx.NUMBER().getText());
         expressions.put(ctx, StringWrapperBldr(q.toString()));
-        logger.info(q.toString());
     }
 
     @Override
@@ -129,7 +124,6 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
         StringBuffer q = new StringBuffer();
         q.append(ctx.FIELD().getText()).append(" >= ").append(ctx.NUMBER().getText());
         expressions.put(ctx, StringWrapperBldr(q.toString()));
-        logger.info(q.toString());
     }
 
     @Override
@@ -145,7 +139,6 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
                 .append(" = ")
                 .append(isNumber? ctx.NUMBER().getText() : ctx.STRING().getText());
         expressions.put(ctx, StringWrapperBldr(q.toString()));
-        logger.info(q.toString());
     }
 
     @Override
@@ -163,7 +156,6 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
                 .append(" != ")
                 .append(isNumber? ctx.NUMBER().getText() : ctx.STRING().getText());
         expressions.put(ctx, StringWrapperBldr(q.toString()));
-        logger.info(q.toString());
 
     }
 
@@ -192,7 +184,6 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
     public void exitIn(ResqlLangParser.InContext ctx) {
         logger.debug(ctx.getText());
         String inExp = ctx.FIELD().getText() + " IN " + chkAndExtractStr(expressions.get(ctx.array()));
-        logger.info(inExp);
         expressions.put(ctx, StringWrapperBldr(inExp));
     }
 
