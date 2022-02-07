@@ -12,7 +12,7 @@ public class JdbcHandle {
 
     public JdbcHandle(String url, String username, String password) {
         try {
-            //TODO Definitely not ok in a multi-threaded context but is it still ok to share a connection here between test runs
+            //TODO.md Definitely not ok in a multi-threaded context but is it still ok to share a connection here between test runs
             connection = DriverManager.getConnection(url, username, password);
         } catch (SQLTimeoutException e) {
             throw new RuntimeException(e.getMessage());
