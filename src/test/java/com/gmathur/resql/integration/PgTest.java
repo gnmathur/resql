@@ -12,7 +12,6 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -76,7 +75,6 @@ public class PgTest {
         String where = w.process("length > 52 && length <57").get();
         ResultSet rs = jdbcHandle.doQuery("select film_id from film where " + where);
         Set<Integer> got = new HashSet<>();
-        // Expected values are inferred from the migration ABV0.2__init.sql
         Set<Integer> expected = new HashSet<>(Arrays.asList(8, 66, 97, 110, 164, 199));
         while (rs.next()) {
             got.add(rs.getInt(1));
@@ -115,7 +113,7 @@ public class PgTest {
 
     @Test
     public void strInTestWithAndClauses() throws SQLException {
-        final String clause = "rating ^['G', 'PG'] && film_id > 10 && film_id < 20";
+        final String clause = "rating ^^['G', 'PG'] && film_id > 10 && film_id < 20";
         ResqlWhereBuilder w = new ResqlWhereBuilderPg();
         String where = w.process(clause).get();
         ResultSet rs = jdbcHandle.doQuery("select film_id from film where " + where);
@@ -129,7 +127,7 @@ public class PgTest {
 
     @Test
     public void intInTestWithAndClauses() throws SQLException {
-        final String clause = "length ^[123, 124, 125, 127]";
+        final String clause = "length ^^[123, 124, 125, 127]";
         ResqlWhereBuilder w = new ResqlWhereBuilderPg();
         String where = w.process(clause).get();
         ResultSet rs = jdbcHandle.doQuery("select film_id from film where " + where);
