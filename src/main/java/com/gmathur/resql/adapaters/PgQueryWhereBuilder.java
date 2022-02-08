@@ -6,6 +6,7 @@ import com.gmathur.resql.models.ResqlListenerDataModels;
 import com.gmathur.resql.models.ResqlListenerDataModels.IntTuple;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.slf4j.Logger;
@@ -183,19 +184,37 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
     @Override
     public void exitIn(ResqlLangParser.InContext ctx) {
         logger.debug(ctx.getText());
-        String inExp = ctx.FIELD().getText() + " IN " + chkAndExtractStr(expressions.get(ctx.array()));
+
+        ParseTree node = (ctx.arrayN() != null) ? ctx.arrayN() : ctx.arrayS();
+        String inExp = ctx.FIELD().getText() + " IN " + chkAndExtractStr(expressions.get(node));
         expressions.put(ctx, StringWrapperBldr(inExp));
     }
 
     @Override
-    public void enterArray(ResqlLangParser.ArrayContext ctx) { }
+    public void enterArrayN(ResqlLangParser.ArrayNContext ctx) { }
 
     @Override
-    public void exitArray(ResqlLangParser.ArrayContext ctx) {
+    public void exitArrayN(ResqlLangParser.ArrayNContext ctx) {
         logger.debug(ctx.getText());
         final StringBuffer sb = new StringBuffer();
         sb.append("(");
         for (TerminalNode n:  ctx.NUMBER()) {
+            sb.append(n.toString()).append(",");
+        }
+        sb.setCharAt(sb.length()-1, ')');
+        expressions.put(ctx, new ResqlListenerDataModels.StringWrapper(sb.toString()));
+        logger.debug(sb.toString());
+    }
+
+    @Override
+    public void enterArrayS(ResqlLangParser.ArraySContext ctx) { }
+
+    @Override
+    public void exitArrayS(ResqlLangParser.ArraySContext ctx) {
+        logger.debug(ctx.getText());
+        final StringBuffer sb = new StringBuffer();
+        sb.append("(");
+        for (TerminalNode n:  ctx.STRING()) {
             sb.append(n.toString()).append(",");
         }
         sb.setCharAt(sb.length()-1, ')');

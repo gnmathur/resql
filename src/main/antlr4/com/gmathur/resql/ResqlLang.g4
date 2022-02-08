@@ -21,9 +21,11 @@ notequal    : FIELD NEQ (NUMBER | STRING);
 // Field is between a range of values
 between     : FIELD BTW tuple;
 // Field is one of the values in the range
-in          : FIELD IN array;
-// An array or a range
-array       : SQOPEN NUMBER (SEP | NUMBER)* SQCLOSE;
+in          : FIELD IN (arrayN | arrayS);
+// An array or a range of numbers
+arrayN       : SQOPEN NUMBER (SEP | NUMBER)* SQCLOSE;
+arrayS       : SQOPEN  (SEP | STRING)* SQCLOSE;
+
 // 2-Tuple
 tuple       : OPENPAREN NUMBER SEP NUMBER CLOSEPAREN;
 /** Lexer Rules **/
@@ -45,22 +47,24 @@ AND : '&&';
 OR  : '||';
 
 // Base tokens
-fragment DIGIT       : [0-9];
-fragment UPPERCASE   : [A-Z];
-fragment LOWERCASE   : [a-z];
-fragment QUOTE       : '\'';
+fragment DIGIT          : [0-9];
+fragment UPPERCASE      : [A-Z];
+fragment LOWERCASE      : [a-z];
+fragment QUOTE          : '\'';
+fragment UNDERSCORE     : '_';
 
 SEP         : ',';
 SQOPEN      : '[';
 SQCLOSE     : ']';
 OPENPAREN   : '(';
 CLOSEPAREN  : ')';
+HYPHEN      : '-';
 // Integer and floating point numbers
 NUMBER  : DIGIT+
             | DIGIT+ '.' DIGIT+
             ;
 // String identifiers
-STRING  : QUOTE (UPPERCASE | LOWERCASE | DIGIT)+ QUOTE;
-FIELD   : (UPPERCASE | LOWERCASE | DIGIT)+;
+STRING  : QUOTE (UPPERCASE | LOWERCASE | DIGIT | HYPHEN)+ QUOTE;
+FIELD   : (UPPERCASE | LOWERCASE | DIGIT | UNDERSCORE )+;
 
 WS      : [ \t\r\n]+ -> skip;

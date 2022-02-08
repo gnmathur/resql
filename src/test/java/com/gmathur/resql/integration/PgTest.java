@@ -21,7 +21,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-// Expected values are inferred from the migration V0.2__init.sql
+// Expected values are inferred from the migration ABV0.2__init.sql
 @Testcontainers
 public class PgTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(PgTest.class);
@@ -71,16 +71,73 @@ public class PgTest {
     }
 
     @Test
-    public void gtLtTest() throws SQLException {
+    public void gtGtLtSameFieldTest() throws SQLException {
         ResqlWhereBuilder w = new ResqlWhereBuilderPg();
-        String where = w.process("length > 55 && length <57").get();
+        String where = w.process("length > 52 && length <57").get();
         ResultSet rs = jdbcHandle.doQuery("select film_id from film where " + where);
         Set<Integer> got = new HashSet<>();
-        // Expected values are inferred from the migration V0.2__init.sql
-        Set<Integer> expected = new HashSet<>(Arrays.asList(97, 199, 226, 369, 565));
+        // Expected values are inferred from the migration ABV0.2__init.sql
+        Set<Integer> expected = new HashSet<>(Arrays.asList(8, 66, 97, 110, 164, 199));
         while (rs.next()) {
             got.add(rs.getInt(1));
         }
-        assertEquals(got, expected);
+        assertEquals(expected, got);
+    }
+
+    @Test
+    public void gtGtLtDifferentFieldsTest() throws SQLException {
+        ResqlWhereBuilder w = new ResqlWhereBuilderPg();
+        String where = w.process("length >170   &&  rental_duration >  6").get();
+        ResultSet rs = jdbcHandle.doQuery("select film_id from film where " + where);
+        Set<Integer> got = new HashSet<>();
+        // Expected values are inferred from the migration ABV0.2__init.sql
+        Set<Integer> expected = new HashSet<>(Arrays.asList(27, 88, 94, 128, 182));
+        while (rs.next()) {
+            got.add(rs.getInt(1));
+        }
+        assertEquals(expected, got);
+    }
+
+    @Test
+    public void parenOrAndAndTest() throws SQLException {
+        final String clause = "(rating == 'G'||rating ==  'PG') && (length > 180)";
+        ResqlWhereBuilder w = new ResqlWhereBuilderPg();
+        String where = w.process(clause).get();
+        ResultSet rs = jdbcHandle.doQuery("select film_id from film where " + where);
+        Set<Integer> got = new HashSet<>();
+        // Expected values are inferred from the migration ABV0.2__init.sql
+        Set<Integer> expected = new HashSet<>(Arrays.asList(50, 128, 182));
+        while (rs.next()) {
+            got.add(rs.getInt(1));
+        }
+        assertEquals(expected, got);
+    }
+
+    @Test
+    public void strInTestWithAndClauses() throws SQLException {
+        final String clause = "rating ^['G', 'PG'] && film_id > 10 && film_id < 20";
+        ResqlWhereBuilder w = new ResqlWhereBuilderPg();
+        String where = w.process(clause).get();
+        ResultSet rs = jdbcHandle.doQuery("select film_id from film where " + where);
+        Set<Integer> got = new HashSet<>();
+        Set<Integer> expected = new HashSet<>(Arrays.asList(11, 12, 13, 19));
+        while (rs.next()) {
+            got.add(rs.getInt(1));
+        }
+        assertEquals(expected, got);
+    }
+
+    @Test
+    public void intInTestWithAndClauses() throws SQLException {
+        final String clause = "length ^[123, 124, 125, 127]";
+        ResqlWhereBuilder w = new ResqlWhereBuilderPg();
+        String where = w.process(clause).get();
+        ResultSet rs = jdbcHandle.doQuery("select film_id from film where " + where);
+        Set<Integer> got = new HashSet<>();
+        Set<Integer> expected = new HashSet<>(Arrays.asList(36, 95, 105, 145, 158));
+        while (rs.next()) {
+            got.add(rs.getInt(1));
+        }
+        assertEquals(expected, got);
     }
 }

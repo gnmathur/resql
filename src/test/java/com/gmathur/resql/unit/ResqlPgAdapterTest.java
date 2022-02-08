@@ -82,13 +82,13 @@ public class ResqlPgAdapterTest {
     }
 
     @Test
-    public void tc6LogicalTest() {
+    public void tc6LogicalAndTest() {
         final String restWhereArg1 = "age < 50 && size < 10 oxxxr city = \"fremont\"";
         final String expected1 = "age < 50 AND size < 10";
         final Optional<String> res1 = w.process(restWhereArg1);
-        System.out.println(res1.get());
         assertTrue(res1.isPresent()); assertEquals(expected1, res1.get());
     }
+
 
     @Test
     public void tc7ComplexWhere() {
@@ -101,4 +101,11 @@ public class ResqlPgAdapterTest {
         assertEquals(expected, res.get());
     }
 
+    @Test
+    public void tc6FieldsCanHaveUnderscoreTest() {
+        final String restWhereArg1 = "rental_length > 10";
+        final String expected1 = "rental_length > 10";
+        final Optional<String> res1 = w.process(restWhereArg1);
+        assertTrue(res1.isPresent()); assertEquals(expected1, res1.get());
+    }
 }
