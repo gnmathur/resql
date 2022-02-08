@@ -96,6 +96,7 @@ public class ResqlPgAdapterTest {
         final Optional<String> res2 = w.process(restWhereArg2);
         assertTrue(res2.isPresent()); assertEquals(expected2, res2.get());
     }
+  
     @Test
     public void tc7LogicalAnd() {
         final String restWhereArg1 = "age < 50 && size < 10 || city == 'fremont'";
@@ -103,6 +104,7 @@ public class ResqlPgAdapterTest {
         final Optional<String> res1 = w.process(restWhereArg1);
         assertTrue(res1.isPresent()); assertEquals(expected1, res1.get());
     }
+
 
     @Test
     public void tc8ComplexWhere() {
@@ -122,7 +124,7 @@ public class ResqlPgAdapterTest {
         final Optional<String> res1 = w.process(restWhereArg1);
         assertTrue(res1.isPresent()); assertEquals(expected1, res1.get());
     }
-
+  
     private void assertThrowsCheck(final String clause) {
         assertThrows(ResqlParseException.class, () -> {
             final String restWhereArg1 = clause;
@@ -146,5 +148,4 @@ public class ResqlPgAdapterTest {
         assertThrowsCheck("age ><10, 11"); // missing paren
         assertThrowsCheck("age ><10, 11");
     }
-
 }
