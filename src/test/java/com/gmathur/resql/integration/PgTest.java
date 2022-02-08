@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 // Expected values are inferred from the migration ABV0.2__init.sql
 @Testcontainers
 public class PgTest {
-    /*
     private static final Logger LOGGER = LoggerFactory.getLogger(PgTest.class);
     private static final String POSTGRES_USER = "resql";
     private static final String POSTGRES_PASSWORD = "resql";
@@ -114,7 +113,7 @@ public class PgTest {
 
     @Test
     public void strInTestWithAndClauses() throws SQLException {
-        final String clause = "rating ^['G', 'PG'] && film_id > 10 && film_id < 20";
+        final String clause = "rating ^^['G', 'PG'] && film_id > 10 && film_id < 20";
         ResqlWhereBuilder w = new ResqlWhereBuilderPg();
         String where = w.process(clause).get();
         ResultSet rs = jdbcHandle.doQuery("select film_id from film where " + where);
@@ -128,7 +127,7 @@ public class PgTest {
 
     @Test
     public void intInTestWithAndClauses() throws SQLException {
-        final String clause = "length ^[123, 124, 125, 127]";
+        final String clause = "length ^^[123, 124, 125, 127]";
         ResqlWhereBuilder w = new ResqlWhereBuilderPg();
         String where = w.process(clause).get();
         ResultSet rs = jdbcHandle.doQuery("select film_id from film where " + where);
@@ -139,6 +138,4 @@ public class PgTest {
         }
         assertEquals(expected, got);
     }
-
-     */
 }
