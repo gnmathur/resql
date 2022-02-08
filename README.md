@@ -55,7 +55,26 @@ field != 10
 field != 'foo'
 ```
 
-### Logical Operators
+### Regular expression
+`resql` supports the following subset of Regular Expression abilities defined in POSIX 1003.2 and other DB engines
+
+| Atom        | Description              |
+| ----------- | ------------------------ |
+| .           | match a single character |
+
+
+| Quantifier  | Description                               |
+| ----------- | ----------------------------------------- |
+| *           | 0 or more matches of atom                 |
+| +           | 1 or more matches of atom                 |
+| ?           | 0 or 1 match of the arom                  |
+
+| Constraint | Description                |
+| ---------- | -------------------------- |
+| ^          | Match beginning of String  |
+| $          | Match end of string        |
+
+## Logical Operators
 
 ### In `^`
 ```bash

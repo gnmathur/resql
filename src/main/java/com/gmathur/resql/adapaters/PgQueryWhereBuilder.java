@@ -74,6 +74,10 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
             expressions.put(ctx, expressions.get(ctx.gtexp()));
         } else if (ctx.ltexp() != null) {
             expressions.put(ctx, expressions.get(ctx.ltexp()));
+        } else if (ctx.gteexp() != null) {
+            expressions.put(ctx, expressions.get(ctx.gteexp()));
+        } else if (ctx.lteexp() != null) {
+            expressions.put(ctx, expressions.get(ctx.lteexp()));
         } else if (ctx.in() != null) {
             expressions.put(ctx, expressions.get(ctx.in()));
         } else if (ctx.between() != null) {

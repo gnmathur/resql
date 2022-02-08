@@ -1,6 +1,6 @@
 grammar ResqlLang;
 
-qexp    : subexp
+qexp    : subexp EOF
         | EOF
         ;
 
@@ -33,14 +33,15 @@ tuple       : OPENPAREN NUMBER SEP NUMBER CLOSEPAREN;
 // Operators
 
 // Comparison operators - comparing values yielding a true or false result
-EQ : '==';
-NEQ : '!=';
-GTE : '>=';
-LTE : '<=';
-GT  : '>';
-LT  : '<';
-BTW : '><'; // between
-IN  : '^';
+EQ      : '=='; // equal to
+NEQ     : '!='; // not equal to
+GTE     : '>='; // greater than or equal to
+LTE     : '<='; // less than or equal to
+GT      : '>';  // greater than
+LT      : '<';  // less than
+BTW     : '><'; // between two elements
+IN      : '^^';  // match an element in a defined range
+MATCH   : '~~';  // match
 
 // Logical operators - combine boolean expressions
 AND : '&&';
@@ -59,12 +60,21 @@ SQCLOSE     : ']';
 OPENPAREN   : '(';
 CLOSEPAREN  : ')';
 HYPHEN      : '-';
+CARET       : '^';
+PERCENT     : '%';
+PERIOD      : '.';
+STAR        : '*';
+QUESTION    : '?';
+OPENBRACE   : '{';
+CLOSEBRACE  : '}';
+
 // Integer and floating point numbers
 NUMBER  : DIGIT+
             | DIGIT+ '.' DIGIT+
             ;
 // String identifiers
 STRING  : QUOTE (UPPERCASE | LOWERCASE | DIGIT | HYPHEN)+ QUOTE;
+REGEX   : QUOTE QUOTE (CARET | PERCENT | PERIOD | STAR | UPPERCASE | LOWERCASE )+ QUOTE QUOTE;
 FIELD   : (UPPERCASE | LOWERCASE | DIGIT | UNDERSCORE )+;
 
 WS      : [ \t\r\n]+ -> skip;

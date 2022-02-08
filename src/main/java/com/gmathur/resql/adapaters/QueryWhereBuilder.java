@@ -1,7 +1,6 @@
 package com.gmathur.resql.adapaters;
 
 import com.gmathur.resql.ResqlLangListener;
-import org.antlr.v4.runtime.BaseErrorListener;
 
 import java.util.Optional;
 
