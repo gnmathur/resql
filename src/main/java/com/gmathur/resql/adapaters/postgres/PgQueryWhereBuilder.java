@@ -1,6 +1,7 @@
-package com.gmathur.resql.adapaters;
+package com.gmathur.resql.adapaters.postgres;
 
 import com.gmathur.resql.ResqlLangParser;
+import com.gmathur.resql.adapaters.QueryWhereBuilder;
 import com.gmathur.resql.models.ComputedObj;
 import com.gmathur.resql.models.ResqlListenerDataModels;
 import com.gmathur.resql.models.ResqlListenerDataModels.IntTuple;
@@ -206,7 +207,7 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
             sb.append(n.toString()).append(",");
         }
         sb.setCharAt(sb.length()-1, ')');
-        expressions.put(ctx, new ResqlListenerDataModels.StringWrapper(sb.toString()));
+        expressions.put(ctx, StringWrapperBldr(sb.toString()));
         logger.debug(sb.toString());
     }
 
@@ -222,14 +223,23 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
             sb.append(n.toString()).append(",");
         }
         sb.setCharAt(sb.length()-1, ')');
-        expressions.put(ctx, new ResqlListenerDataModels.StringWrapper(sb.toString()));
+        expressions.put(ctx, StringWrapperBldr(sb.toString()));
         logger.debug(sb.toString());
     }
 
     @Override
-    public void enterTuple(ResqlLangParser.TupleContext ctx) {
+    public void enterLike(ResqlLangParser.LikeContext ctx) { }
 
+    @Override
+    public void exitLike(ResqlLangParser.LikeContext ctx) {
+        logger.debug(ctx.getText());
+        final StringBuilder sb = new StringBuilder();
+        sb.append(ctx.FIELD()).append(" ~ ").append(ctx.STRING());
+        expressions.put(ctx, StringWrapperBldr(sb.toString()));
     }
+
+    @Override
+    public void enterTuple(ResqlLangParser.TupleContext ctx) { }
 
     @Override
     public void exitTuple(ResqlLangParser.TupleContext ctx) {

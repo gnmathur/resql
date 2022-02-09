@@ -1,16 +1,8 @@
 package com.gmathur.resql.unit;
 
-import com.gmathur.resql.ResqlLangLexer;
-import com.gmathur.resql.ResqlLangParser;
 import com.gmathur.resql.ResqlWhereBuilder;
 import com.gmathur.resql.ResqlWhereBuilderPg;
-import com.gmathur.resql.adapaters.PgQueryWhereBuilder;
 import com.gmathur.resql.exceptions.ResqlParseException;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
