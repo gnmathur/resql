@@ -1,10 +1,7 @@
 package com.gmathur.resql;
 
-import com.gmathur.resql.adapaters.PgQueryWhereBuilder;
-
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import java.util.Optional;
 

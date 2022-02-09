@@ -1,6 +1,6 @@
 package com.gmathur.resql;
 
-import com.gmathur.resql.adapaters.PgQueryWhereBuilder;
+import com.gmathur.resql.adapaters.postgres.PgQueryWhereBuilder;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 

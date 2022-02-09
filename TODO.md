@@ -7,3 +7,5 @@
 - [X] Add tests for floating point column values
 - [ ] Add support in the grammar for Substring matching
 - [x] Add basic negative test cases
+- [ ] Beef-up negative test cases
+- [ ] String type currently supports a limited set of characters. Expand the notion of string without breaking the special character support like `==`, `>` etc.
