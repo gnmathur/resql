@@ -28,6 +28,7 @@ The query language is expressed as an infix expression.
     * Nil Absence of a value. Example: `field` != Nil
 
 ### Conditional Operators
+
 #### equal to `EQ`|`eq`
 ```bash
 film_title eq 'Dune'
