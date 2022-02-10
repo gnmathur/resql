@@ -5,9 +5,9 @@ A Java library for translating custom query grammar into target DB where clauses
 
 ## Feature
 * Provide a more succinct way to express query argument "where" clauses
+* In-built syntactic and semantic checks. The query argument has a well-defined grammar enforcing the checks. Malformed queries can be indicated back to the user at the API layer itself.
 * Has multiple DB bindings including `Postgres`, `MongoDB`, and `MySQL`
 * Default and extensible safeguards to filter out unwanted queries. For example, the PG adapter has defaults to prevent queries that look like SQL injection
-* In-built syntactic and semantic checks. The query argument has a well-defined grammar enforcing the checks. Malformed queries can be indicated back to the user at the API layer itself.
  
 ## Build
 
@@ -28,13 +28,18 @@ The query language is expressed as an infix expression.
     * Nil Absence of a value. Example: `field` != Nil
 
 ### Conditional Operators
-#### greater than `>`
+#### equal to `=`
 ```bash
-field > 10
+film_title eq 'Dune'
 ```
-#### less than `<`
+
+#### greater than `gt`|`GT`
 ```bash
-field < 10
+field GT 10
+```
+#### less than `lt`|`LT`
+```bash
+field LT 10
 ```
 #### less than or equal to `<=`
 ```bash
@@ -83,15 +88,15 @@ field ^["foo", "bar", "baz"]
 ```
 
 ### 
-### And '&&'
+### And `AND`|`and`
 ```bash
-field1 == 10 && field2 == 11
-field1 == 10 && field3 == 'foo'
+field1 EQ 10 AND field2 EQ 11
+field1 EQ 10 AND field3 EQ 'foo'
 ```
-### Or '||'
+### Or `OR`|`or`
 ```bash
-field1 == 10 || field2 == 11
-field1 == 10 || field3 == 'foo'
+field1 EQ 10 OR field2 EQ 11
+field1 EQ 10 OR field3 EQ 'foo'
 ```
 
 ### Parenthesis
