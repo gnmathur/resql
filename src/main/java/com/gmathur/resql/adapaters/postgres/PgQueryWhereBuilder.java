@@ -2,6 +2,7 @@ package com.gmathur.resql.adapaters.postgres;
 
 import com.gmathur.resql.ResqlLangParser;
 import com.gmathur.resql.adapaters.QueryWhereBuilder;
+import com.gmathur.resql.exceptions.ResqlParseException;
 import com.gmathur.resql.models.ComputedObj;
 import com.gmathur.resql.models.ResqlListenerDataModels;
 import com.gmathur.resql.models.ResqlListenerDataModels.IntTuple;
@@ -83,6 +84,8 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
             expressions.put(ctx, expressions.get(ctx.in()));
         } else if (ctx.between() != null) {
             expressions.put(ctx, expressions.get(ctx.between()));
+        } else if (ctx.like() != null) {
+            expressions.put(ctx, expressions.get(ctx.like()));
         }
     }
 
@@ -234,7 +237,10 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
     public void exitLike(ResqlLangParser.LikeContext ctx) {
         logger.debug(ctx.getText());
         final StringBuilder sb = new StringBuilder();
-        sb.append(ctx.FIELD()).append(" ~ ").append(ctx.STRING());
+        if (!PgQueryWhereValidators.validateLikePattern(ctx.STRING().getText())) {
+            throw new ResqlParseException("Invalid Postgres LIKE pattern");
+        }
+        sb.append(ctx.FIELD()).append(" LIKE ").append(ctx.STRING());
         expressions.put(ctx, StringWrapperBldr(sb.toString()));
     }
 
