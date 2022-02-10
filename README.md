@@ -28,7 +28,8 @@ The query language is expressed as an infix expression.
     * Nil Absence of a value. Example: `field` != Nil
 
 ### Conditional Operators
-#### equal to `=`
+
+#### equal to `EQ`|`eq`
 ```bash
 film_title eq 'Dune'
 ```
@@ -81,10 +82,10 @@ field != 'foo'
 
 ## Logical Operators
 
-### In `^`
+### In `IN`|`in`
 ```bash
-field ^[10, 11, 12]
-field ^["foo", "bar", "baz"]
+field IN[10, 11, 12]
+field IN["foo", "bar", "baz"]
 ```
 
 ### 
