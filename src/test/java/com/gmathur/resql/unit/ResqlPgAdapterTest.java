@@ -16,18 +16,18 @@ public class ResqlPgAdapterTest {
 
     @Test
     public void tc1GreaterThanOnlyAndIgnoringWhitespace() {
-        final String restWhereArg = "f1    >    10";
+        final String restWhereArg = "f1    gt    10";
         final Optional<String> res = w.process(restWhereArg);
         assertTrue(res.isPresent()); assertEquals("f1 > 10", res.get());
     }
 
     @Test
     public void tc2LessThanOnlyAndNoWhitespace() {
-        final String restWhereArg1 = "f1<17";
+        final String restWhereArg1 = "f1 lt 17";
         final Optional<String> res = w.process(restWhereArg1);
         assertTrue(res.isPresent()); assertEquals("f1 < 17", res.get());
 
-        final String restWhereArg2 = "f1   <   17";
+        final String restWhereArg2 = "f1   lt   17";
         final Optional<String> res2 = w.process(restWhereArg2);
         assertTrue(res2.isPresent()); assertEquals("f1 < 17", res2.get());
     }
@@ -47,7 +47,7 @@ public class ResqlPgAdapterTest {
 
     @Test
     public void tc4InWithWhitespace() {
-        final String restWhereArg1 = "size ^^ [3, 5, 7,   11, 13]";
+        final String restWhereArg1 = "size IN [3, 5, 7,   11, 13]";
         final String expected1 = "size IN (3,5,7,11,13)";
         final Optional<String> res1 = w.process(restWhereArg1);
         assertTrue(res1.isPresent()); assertEquals(expected1, res1.get());
@@ -55,22 +55,22 @@ public class ResqlPgAdapterTest {
 
     @Test
     public void tc5gtAndLtCombinations() {
-        final String restWhereArg1 = "age >10  && size  <   100";
+        final String restWhereArg1 = "age GT 10  AND size  LT   100";
         final String expected1 = "age > 10 AND size < 100";
         final Optional<String> res1 = w.process(restWhereArg1);
         assertTrue(res1.isPresent()); assertEquals(expected1, res1.get());
 
-        final String restWhereArg2 = "age < 50    && size  > 100";
+        final String restWhereArg2 = "age lT 50    AND size  gT 100";
         final String expected2 = "age < 50 AND size > 100";
         final Optional<String> res2 = w.process(restWhereArg2);
         assertTrue(res2.isPresent()); assertEquals(expected2, res2.get());
 
-        final String restWhereArg3 = "age > 50 && size > 10";
+        final String restWhereArg3 = "age Gt 50 AND size Gt 10";
         final String expected3 = "age > 50 AND size > 10";
         final Optional<String> res3 = w.process(restWhereArg3);
         assertTrue(res3.isPresent()); assertEquals(expected3, res3.get());
 
-        final String restWhereArg4 = "age < 50 && size < 10";
+        final String restWhereArg4 = "age LT 50 AND size LT 10";
         final String expected4 = "age < 50 AND size < 10";
         final Optional<String> res4 = w.process(restWhereArg4);
         assertTrue(res4.isPresent()); assertEquals(expected4, res4.get());
@@ -78,12 +78,12 @@ public class ResqlPgAdapterTest {
 
     @Test
     public void tc6FloatingPoint() {
-        final String restWhereArg1 = "width_ft > 10.22 && length  <= 100.2  && height_ft <= 0.22";
+        final String restWhereArg1 = "width_ft GT 10.22 AND length  <= 100.2  AND height_ft <= 0.22";
         final String expected1 = "width_ft > 10.22 AND length >= 100.2 AND height_ft >= 0.22";
         final Optional<String> res1 = w.process(restWhereArg1);
         assertTrue(res1.isPresent()); assertEquals(expected1, res1.get());
 
-        final String restWhereArg2 = "(width_ft > 10.22 || length  <= 100.2)&&height_ft <= 0.22";
+        final String restWhereArg2 = "(width_ft GT 10.22 OR length  <= 100.2) and height_ft <= 0.22";
         final String expected2 = "(width_ft > 10.22 OR length >= 100.2) AND height_ft >= 0.22";
         final Optional<String> res2 = w.process(restWhereArg2);
         assertTrue(res2.isPresent()); assertEquals(expected2, res2.get());
@@ -91,7 +91,7 @@ public class ResqlPgAdapterTest {
   
     @Test
     public void tc7LogicalAnd() {
-        final String restWhereArg1 = "age < 50 && size < 10 || city == 'fremont'";
+        final String restWhereArg1 = "age LT 50 and size LT 10 or city EQ 'fremont'";
         final String expected1 = "age < 50 AND size < 10 OR city = 'fremont'";
         final Optional<String> res1 = w.process(restWhereArg1);
         assertTrue(res1.isPresent()); assertEquals(expected1, res1.get());
@@ -100,7 +100,7 @@ public class ResqlPgAdapterTest {
 
     @Test
     public void tc8ComplexWhere() {
-        final String restWhereArg = "(f1 == 10 && (f2 != 11 || f3 == 12) && (f4 > 13)) || (f5 == 'hello') || (f6 ^^[321, 11, 17]) || f7 ><(1, 100)";
+        final String restWhereArg = "(f1 EQ 10 AND (f2 != 11 OR f3 EQ 12) And (f4 GT 13)) oR (f5 EQ 'hello') Or (f6 in[321, 11, 17]) or f7 ><(1, 100)";
         final String expected = "(f1 = 10 AND (f2 != 11 OR f3 = 12) AND (f4 > 13)) OR (f5 = 'hello') OR (f6 IN (321,11,17)) OR (f7 >= 1 AND f7 < 100)";
 
         final Optional<String> res = w.process(restWhereArg);
@@ -111,7 +111,7 @@ public class ResqlPgAdapterTest {
 
     @Test
     public void tc9FieldsCanHaveUnderscore() {
-        final String restWhereArg1 = "rental_length > 10";
+        final String restWhereArg1 = "rental_length GT 10";
         final String expected1 = "rental_length > 10";
         final Optional<String> res1 = w.process(restWhereArg1);
         assertTrue(res1.isPresent()); assertEquals(expected1, res1.get());
