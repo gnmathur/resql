@@ -30,7 +30,7 @@ between     : FIELD BTW tuple;
 in          : FIELD IN (arrayN | arrayS);
 // An array or a range of numbers
 arrayN      : SQOPEN NUMBER (SEP | NUMBER)* SQCLOSE;
-arrayS      : SQOPEN  (SEP | STRING)* SQCLOSE;
+arrayS      : SQOPEN (SEP | STRING)* SQCLOSE;
 // The regex string is not lexed as a valid regex string adhering to a standard, but instead as a STRING. A valid regex
 // string will have to be checked by the respected adapters
 like        : FIELD (MATCH | NEGMATCH) STRING;
@@ -42,6 +42,8 @@ tuple       : OPENPAREN NUMBER SEP NUMBER CLOSEPAREN;
 
 // Non-tokens
 fragment A :('A'|'a');
+fragment B :('B'|'b');
+fragment C :('C'|'c');
 fragment D :('D'|'d');
 fragment E :('E'|'e');
 fragment G :('G'|'g');
@@ -53,6 +55,7 @@ fragment O :('O'|'o');
 fragment Q :('Q'|'q');
 fragment R :('R'|'r');
 fragment T :('T'|'t');
+fragment W :('W'|'w');
 
 fragment DIGIT          : [0-9];
 fragment UPPERCASE      : [A-Z];
@@ -66,8 +69,6 @@ fragment PERCENT     : '%';
 fragment PERIOD      : '.';
 fragment STAR        : '*';
 fragment QUESTION    : '?';
-fragment OPENBRACE   : '{';
-fragment CLOSEBRACE  : '}';
 fragment DOLLAR      : '$';
 fragment PLUS        : '+';
 
@@ -77,21 +78,23 @@ SQOPEN      : '[';
 SQCLOSE     : ']';
 OPENPAREN   : '(';
 CLOSEPAREN  : ')';
+CLOSEBRACE  : '}';
+OPENBRACE   : '{';
 
 // Comparison operators - comparing values yielding a true or false result
-EQ          : E Q; // equal to
-NEQ         : '!='; // not equal to
-GTE         : '>='; // greater than or equal to
-LTE         : '<='; // less than or equal to
-GT          : G T;  // greater than
-LT          : L T;  // less than
-BTW         : '><'; // between two elements
-MATCH       : '~~';  // match
-NEGMATCH    : '!~';  // dont match
+EQ          : '='   ; // equal to
+NEQ         : '!=' ; // not equal to
+GTE         : '>=' ;  // greater than or equal to
+LTE         : '<=' ; // less than or equal to
+GT          : '>'   ;  // greater than
+LT          : '<'   ;  // less than
+BTW         : '><' ; // between two elements
+MATCH       : '~~'  ;  // match
+NEGMATCH    : '!~'  ;  // dont match
 
 // Logical operators - combine boolean expressions
-AND : A N D;
-OR  : O R;
+AND : '&&';
+OR  : '||';
 
 // Unary operators
 IN  : I N; // match an element in a defined range
