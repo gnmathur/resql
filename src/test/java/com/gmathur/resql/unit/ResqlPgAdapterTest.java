@@ -123,6 +123,7 @@ public class ResqlPgAdapterTest {
             final Optional<String> res1 = w.process(restWhereArg1);
         });
     }
+
     @Test
     public void tc10Invalid() {
         assertThrowsCheck("rental_length > 10 ?");
@@ -139,5 +140,13 @@ public class ResqlPgAdapterTest {
         assertThrowsCheck("age BTW((10, 11)"); // extraneous paren
         assertThrowsCheck("age BTW0, 11"); // missing paren
         assertThrowsCheck("age BTW10, 11");
+    }
+
+    @Test
+    public void tc11LikeTest() {
+        final String restWhereArg1 = "foo ~ '%somestring%'";
+        final String expected1 = "foo LIKE '%somestring%'";
+        final Optional<String> res1 = w.process(restWhereArg1);
+        assertTrue(res1.isPresent()); assertEquals(expected1, res1.get());
     }
 }
