@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -38,7 +39,7 @@ public class PgTest {
     public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:13-alpine")
             .withDatabaseName(POSTGRES_DB)
             // TODO.md make PG work on a non-default port
-      //      .withExposedPorts(POSTGRES_EXPOSED_PORT)
+            //      .withExposedPorts(POSTGRES_EXPOSED_PORT)
             .withNetwork(resqlNetwork)
             .withNetworkAliases(POSTGRES_NETWORK_ALIASES)
             .withUsername(POSTGRES_USER)
@@ -64,14 +65,15 @@ public class PgTest {
     @Test
     public void dummyQueryTest() throws SQLException {
         ResultSet rs = jdbcHandle.doQuery("Select 1");
-        while(rs.next()) {
+        while (rs.next()) {
             assertEquals(1, rs.getInt(1));
         }
     }
 
     private static Set<Integer> runTestWithFilmIdResults(final String clause) throws SQLException {
         ResqlWhereBuilder w = new ResqlWhereBuilderPg();
-        String where = w.process(clause).get();
+        String where = w.process(clause).orElseGet(() -> "false");
+        LOGGER.debug("Executing with where clause \"{}\"", where);
         ResultSet rs = jdbcHandle.doQuery("select film_id from film where " + where);
         Set<Integer> got = new HashSet<>();
         while (rs.next()) {
@@ -80,6 +82,7 @@ public class PgTest {
         return got;
 
     }
+
     @Test
     public void gtGtLtSameFieldTest() throws SQLException {
         final String clause = "length > 52 && length < 57";
@@ -116,17 +119,23 @@ public class PgTest {
     }
 
     @Test
-    public void likeTest() throws SQLException {
-        {
-            final String clause = "description ~~ '%rest%' && description ~~ '%rama%'";
-            final Set<Integer> expected = new HashSet<>(Arrays.asList(6, 65, 100));
-            assertEquals(expected, runTestWithFilmIdResults(clause));
-        }
-        {
-            final String clause = "description ~~ '%rest%' && rental_duration = 3";
-            final Set<Integer> expected = new HashSet<>(Arrays.asList(6, 65, 156));
-            assertEquals(expected, runTestWithFilmIdResults(clause));
-        }
+    public void likeNotLikeTest1() throws SQLException {
+        final String clause = "description ~ '%rest%' && description ~ '%rama%'";
+        final Set<Integer> expected = new HashSet<>(Arrays.asList(6, 65, 100));
+        assertEquals(expected, runTestWithFilmIdResults(clause));
+    }
 
+    @Test
+    public void likeNotLikeTest2() throws SQLException {
+        final String clause = "description ~ '%rest%' && rental_duration = 3";
+        final Set<Integer> expected = new HashSet<>(Arrays.asList(6, 65, 156));
+        assertEquals(expected, runTestWithFilmIdResults(clause));
+    }
+
+    @Test
+    public void likeNotLikeTest3() throws SQLException {
+        final String clause = "description !~ '%base%' && title  ~ '%MA_'";
+        final Set<Integer> expected = new HashSet<>(Arrays.asList(94, 6));
+        assertEquals(expected, runTestWithFilmIdResults(clause));
     }
 }

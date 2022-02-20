@@ -24,11 +24,11 @@ public class ResqlListenerDataModels {
         public String getS() { return s; }
     }
 
-    public static StringWrapper StringWrapperBldr(final String s) {
+    public static StringWrapper StrWrapperBuilder(final String s) {
         return new StringWrapper(s);
     }
 
-    public static IntTuple IntTupleBldr(final int _0, final int _1) {
+    public static IntTuple IntTupleBuilder(final int _0, final int _1) {
         return new IntTuple(_0, _1);
     }
 }

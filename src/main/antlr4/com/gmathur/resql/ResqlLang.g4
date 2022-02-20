@@ -10,7 +10,7 @@ subexp : OPENPAREN subexp CLOSEPAREN
         | gtexp | ltexp | gteexp | lteexp
         | between | in
         | equal | notequal
-        | like
+        | like | notlike
         ;
 
 // Field is greater than a numeric or string value
@@ -33,7 +33,8 @@ arrayN      : SQOPEN NUMBER (SEP | NUMBER)* SQCLOSE;
 arrayS      : SQOPEN (SEP | STRING)* SQCLOSE;
 // The regex string is not lexed as a valid regex string adhering to a standard, but instead as a STRING. A valid regex
 // string will have to be checked by the respected adapters
-like        : FIELD (MATCH | NEGMATCH) STRING;
+like        : FIELD (MATCH) STRING;
+notlike     : FIELD (NEGMATCH) STRING;
 // 2-Tuple
 tuple       : OPENPAREN NUMBER SEP NUMBER CLOSEPAREN;
 
@@ -46,16 +47,27 @@ fragment B :('B'|'b');
 fragment C :('C'|'c');
 fragment D :('D'|'d');
 fragment E :('E'|'e');
+fragment F :('F'|'f');
 fragment G :('G'|'g');
+fragment H :('H'|'h');
 fragment I :('I'|'i');
+fragment J :('J'|'j');
 fragment K :('K'|'k');
 fragment L :('L'|'l');
+fragment M :('M'|'m');
 fragment N :('N'|'n');
 fragment O :('O'|'o');
+fragment P :('P'|'p');
 fragment Q :('Q'|'q');
 fragment R :('R'|'r');
+fragment S :('S'|'s');
 fragment T :('T'|'t');
+fragment U :('U'|'u');
+fragment V :('V'|'v');
 fragment W :('W'|'w');
+fragment X :('X'|'x');
+fragment Y :('Y'|'y');
+fragment Z :('Z'|'z');
 
 fragment DIGIT          : [0-9];
 fragment UPPERCASE      : [A-Z];
@@ -89,7 +101,7 @@ LTE         : '<=' ; // less than or equal to
 GT          : '>'   ;  // greater than
 LT          : '<'   ;  // less than
 BTW         : '><' ; // between two elements
-MATCH       : '~~'  ;  // match
+MATCH       : '~'  ;  // match
 NEGMATCH    : '!~'  ;  // dont match
 
 // Logical operators - combine boolean expressions
@@ -105,7 +117,7 @@ NUMBER  : DIGIT+
             ;
 // String identifiers
 STRING      : QUOTE
-            (UPPERCASE | LOWERCASE | DIGIT | HYPHEN | STAR | PERIOD | PLUS | CARET | PERCENT | EQUAL | GT | LT )+
+            (UPPERCASE | LOWERCASE | DIGIT | HYPHEN | STAR | PERIOD | PLUS | CARET | PERCENT | EQUAL | GT | LT | UNDERSCORE)+
             QUOTE;
 FIELD       : (UPPERCASE | LOWERCASE | DIGIT | UNDERSCORE )+;
 

@@ -14,8 +14,8 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.gmathur.resql.models.ResqlListenerDataModels.IntTupleBldr;
-import static com.gmathur.resql.models.ResqlListenerDataModels.StringWrapperBldr;
+import static com.gmathur.resql.models.ResqlListenerDataModels.IntTupleBuilder;
+import static com.gmathur.resql.models.ResqlListenerDataModels.StrWrapperBuilder;
 
 public class PgQueryWhereBuilder extends QueryWhereBuilder {
     private static final Logger logger = LoggerFactory.getLogger(PgQueryWhereBuilder.class);
@@ -36,7 +36,7 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
 
     @Override
     public void enterQexp(ResqlLangParser.QexpContext ctx) {
-        logger.debug(ctx.getText());
+        logger.trace(ctx.getText());
     }
 
     @Override
@@ -46,12 +46,12 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
 
     @Override
     public void enterSubexp(ResqlLangParser.SubexpContext ctx) {
-        logger.debug(ctx.getText());
+        logger.trace(ctx.getText());
     }
 
     @Override
     public void exitSubexp(ResqlLangParser.SubexpContext ctx) {
-        logger.debug(ctx.getText());
+        logger.trace(ctx.getText());
         if (ctx.equal() != null) {
             expressions.put(ctx, expressions.get(ctx.equal()));
         } else if (ctx.notequal() != null) {
@@ -62,16 +62,16 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
                     .append(chkAndExtractStr(expressions.get(ctx.subexp(0))))
                     .append(" AND ")
                     .append(chkAndExtractStr(expressions.get(ctx.subexp(1))));
-            expressions.put(ctx, StringWrapperBldr(q.toString()));
+            expressions.put(ctx, StrWrapperBuilder(q.toString()));
         } else if (ctx.OR() != null) {
             final StringBuilder q = new StringBuilder();
             q
                     .append(chkAndExtractStr(expressions.get(ctx.subexp(0))))
                     .append(" OR ")
                     .append(chkAndExtractStr(expressions.get(ctx.subexp(1))));
-            expressions.put(ctx, StringWrapperBldr(q.toString()));
+            expressions.put(ctx, StrWrapperBuilder(q.toString()));
         } else if (ctx.OPENPAREN() != null && ctx.CLOSEPAREN() != null) {
-            expressions.put(ctx, StringWrapperBldr("(" + chkAndExtractStr(expressions.get(ctx.subexp(0))) + ")"));
+            expressions.put(ctx, StrWrapperBuilder("(" + chkAndExtractStr(expressions.get(ctx.subexp(0))) + ")"));
         } else if (ctx.gtexp() != null) {
             expressions.put(ctx, expressions.get(ctx.gtexp()));
         } else if (ctx.ltexp() != null) {
@@ -86,20 +86,38 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
             expressions.put(ctx, expressions.get(ctx.between()));
         } else if (ctx.like() != null) {
             expressions.put(ctx, expressions.get(ctx.like()));
+        } else if (ctx.notlike() != null) {
+            expressions.put(ctx, expressions.get(ctx.notlike()));
         }
     }
 
     @Override
+    public void enterNotlike(ResqlLangParser.NotlikeContext ctx) {
+
+    }
+
+    @Override
+    public void exitNotlike(ResqlLangParser.NotlikeContext ctx) {
+        logger.trace(ctx.getText());
+        final StringBuilder sb = new StringBuilder();
+        if (!PgQueryWhereValidators.validateLikePattern(ctx.STRING().getText())) {
+            throw new ResqlParseException("Invalid Postgres NOT LIKE pattern");
+        }
+        sb.append(ctx.FIELD()).append(" NOT LIKE ").append(ctx.STRING());
+        expressions.put(ctx, StrWrapperBuilder(sb.toString()));
+    }
+
+    @Override
     public void enterGtexp(ResqlLangParser.GtexpContext ctx) {
-        logger.debug(ctx.getText());
+        logger.trace(ctx.getText());
     }
 
     @Override
     public void exitGtexp(ResqlLangParser.GtexpContext ctx) {
-        logger.debug(ctx.getText());
+        logger.trace(ctx.getText());
         StringBuffer q = new StringBuffer();
         q.append(ctx.FIELD().getText()) .append(" > ") .append(ctx.NUMBER().getText());
-        expressions.put(ctx, StringWrapperBldr(q.toString()));
+        expressions.put(ctx, StrWrapperBuilder(q.toString()));
     }
 
     @Override
@@ -107,10 +125,10 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
 
     @Override
     public void exitLtexp(ResqlLangParser.LtexpContext ctx) {
-        logger.debug(ctx.getText());
+        logger.trace(ctx.getText());
         StringBuffer q = new StringBuffer();
         q.append(ctx.FIELD().getText()).append(" < ").append(ctx.NUMBER().getText());
-        expressions.put(ctx, StringWrapperBldr(q.toString()));
+        expressions.put(ctx, StrWrapperBuilder(q.toString()));
     }
 
     @Override
@@ -118,10 +136,10 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
 
     @Override
     public void exitLteexp(ResqlLangParser.LteexpContext ctx) {
-        logger.debug(ctx.getText());
+        logger.trace(ctx.getText());
         StringBuffer q = new StringBuffer();
         q.append(ctx.FIELD().getText()).append(" <= ").append(ctx.NUMBER().getText());
-        expressions.put(ctx, StringWrapperBldr(q.toString()));
+        expressions.put(ctx, StrWrapperBuilder(q.toString()));
     }
 
     @Override
@@ -129,10 +147,10 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
 
     @Override
     public void exitGteexp(ResqlLangParser.GteexpContext ctx) {
-        logger.debug(ctx.getText());
+        logger.trace(ctx.getText());
         StringBuffer q = new StringBuffer();
         q.append(ctx.FIELD().getText()).append(" >= ").append(ctx.NUMBER().getText());
-        expressions.put(ctx, StringWrapperBldr(q.toString()));
+        expressions.put(ctx, StrWrapperBuilder(q.toString()));
     }
 
     @Override
@@ -140,14 +158,14 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
 
     @Override
     public void exitEqual(ResqlLangParser.EqualContext ctx) {
-        logger.debug(ctx.getText());
+        logger.trace(ctx.getText());
         boolean isNumber = ctx.NUMBER() != null;
 
         StringBuffer q = new StringBuffer();
         q.append(ctx.FIELD().getText())
                 .append(" = ")
                 .append(isNumber? ctx.NUMBER().getText() : ctx.STRING().getText());
-        expressions.put(ctx, StringWrapperBldr(q.toString()));
+        expressions.put(ctx, StrWrapperBuilder(q.toString()));
     }
 
     @Override
@@ -157,14 +175,14 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
 
     @Override
     public void exitNotequal(ResqlLangParser.NotequalContext ctx) {
-        logger.debug(ctx.getText());
+        logger.trace(ctx.getText());
         boolean isNumber = ctx.NUMBER() != null;
 
         StringBuffer q = new StringBuffer();
         q.append(ctx.FIELD().getText())
                 .append(" != ")
                 .append(isNumber? ctx.NUMBER().getText() : ctx.STRING().getText());
-        expressions.put(ctx, StringWrapperBldr(q.toString()));
+        expressions.put(ctx, StrWrapperBuilder(q.toString()));
 
     }
 
@@ -175,13 +193,13 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
 
     @Override
     public void exitBetween(ResqlLangParser.BetweenContext ctx) {
-        logger.debug(ctx.getText());
+        logger.trace(ctx.getText());
         final StringBuilder s = new StringBuilder();
         IntTuple t = chkAndExtractTuple(expressions.get(ctx.tuple()));
         final String l = ctx.FIELD() + " >= " + t.get_0();
         final String r = ctx.FIELD() + " < " + t.get_1();
         s.append("(").append(l).append(" AND ").append(r).append(")");
-        expressions.put(ctx, StringWrapperBldr(s.toString()));
+        expressions.put(ctx, StrWrapperBuilder(s.toString()));
     }
 
     @Override
@@ -191,11 +209,11 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
 
     @Override
     public void exitIn(ResqlLangParser.InContext ctx) {
-        logger.debug(ctx.getText());
+        logger.trace(ctx.getText());
 
         ParseTree node = (ctx.arrayN() != null) ? ctx.arrayN() : ctx.arrayS();
         String inExp = ctx.FIELD().getText() + " IN " + chkAndExtractStr(expressions.get(node));
-        expressions.put(ctx, StringWrapperBldr(inExp));
+        expressions.put(ctx, StrWrapperBuilder(inExp));
     }
 
     @Override
@@ -203,15 +221,15 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
 
     @Override
     public void exitArrayN(ResqlLangParser.ArrayNContext ctx) {
-        logger.debug(ctx.getText());
+        logger.trace(ctx.getText());
         final StringBuffer sb = new StringBuffer();
         sb.append("(");
         for (TerminalNode n:  ctx.NUMBER()) {
             sb.append(n.toString()).append(",");
         }
         sb.setCharAt(sb.length()-1, ')');
-        expressions.put(ctx, StringWrapperBldr(sb.toString()));
-        logger.debug(sb.toString());
+        expressions.put(ctx, StrWrapperBuilder(sb.toString()));
+        logger.trace(sb.toString());
     }
 
     @Override
@@ -219,15 +237,15 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
 
     @Override
     public void exitArrayS(ResqlLangParser.ArraySContext ctx) {
-        logger.debug(ctx.getText());
+        logger.trace(ctx.getText());
         final StringBuffer sb = new StringBuffer();
         sb.append("(");
         for (TerminalNode n:  ctx.STRING()) {
             sb.append(n.toString()).append(",");
         }
         sb.setCharAt(sb.length()-1, ')');
-        expressions.put(ctx, StringWrapperBldr(sb.toString()));
-        logger.debug(sb.toString());
+        expressions.put(ctx, StrWrapperBuilder(sb.toString()));
+        logger.trace(sb.toString());
     }
 
     @Override
@@ -235,13 +253,13 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
 
     @Override
     public void exitLike(ResqlLangParser.LikeContext ctx) {
-        logger.debug(ctx.getText());
+        logger.trace(ctx.getText());
         final StringBuilder sb = new StringBuilder();
         if (!PgQueryWhereValidators.validateLikePattern(ctx.STRING().getText())) {
             throw new ResqlParseException("Invalid Postgres LIKE pattern");
         }
         sb.append(ctx.FIELD()).append(" LIKE ").append(ctx.STRING());
-        expressions.put(ctx, StringWrapperBldr(sb.toString()));
+        expressions.put(ctx, StrWrapperBuilder(sb.toString()));
     }
 
     @Override
@@ -249,10 +267,10 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
 
     @Override
     public void exitTuple(ResqlLangParser.TupleContext ctx) {
-        logger.debug(ctx.getText());
+        logger.trace(ctx.getText());
         final StringBuilder sb = new StringBuilder();
 
-        IntTuple t = IntTupleBldr(
+        IntTuple t = IntTupleBuilder(
                 Integer.parseInt(ctx.NUMBER().get(0).getText()),
                 Integer.parseInt(ctx.NUMBER().get(1).getText()));
         expressions.put(ctx, t);
