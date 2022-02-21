@@ -8,6 +8,8 @@ X - Done
 - [x] Field names should support underscore `_`
 - [x] Add support for "like" and "not like" matches
 - [x] Fix NOT LIKE support
+- [ ] Create default `resql` exception handler
+- [ ] Refactor core `resql` context API with a fluent style
 
 ## P2
 - [x] Fix handling of greater than or equal to `>=` and less than or equal to `<=`

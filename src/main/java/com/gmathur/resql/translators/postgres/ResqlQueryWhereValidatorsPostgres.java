@@ -1,6 +1,6 @@
-package com.gmathur.resql.adapaters.postgres;
+package com.gmathur.resql.translators.postgres;
 
-public class PgQueryWhereValidators {
+public class ResqlQueryWhereValidatorsPostgres {
     public static Boolean validateLikePattern(final String pattern) {
         return true;
     }

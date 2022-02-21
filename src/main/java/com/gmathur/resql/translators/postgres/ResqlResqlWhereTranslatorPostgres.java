@@ -1,8 +1,8 @@
-package com.gmathur.resql.adapaters.postgres;
+package com.gmathur.resql.translators.postgres;
 
 import com.gmathur.resql.ResqlLangParser;
-import com.gmathur.resql.adapaters.QueryWhereBuilder;
-import com.gmathur.resql.exceptions.ResqlParseException;
+import com.gmathur.resql.translators.ResqlWhereTranslator;
+import com.gmathur.resql.exceptions.DefaultResqlParseException;
 import com.gmathur.resql.models.ComputedObj;
 import com.gmathur.resql.models.ResqlListenerDataModels;
 import com.gmathur.resql.models.ResqlListenerDataModels.IntTuple;
@@ -17,8 +17,8 @@ import org.slf4j.LoggerFactory;
 import static com.gmathur.resql.models.ResqlListenerDataModels.IntTupleBuilder;
 import static com.gmathur.resql.models.ResqlListenerDataModels.StrWrapperBuilder;
 
-public class PgQueryWhereBuilder extends QueryWhereBuilder {
-    private static final Logger logger = LoggerFactory.getLogger(PgQueryWhereBuilder.class);
+public class ResqlResqlWhereTranslatorPostgres extends ResqlWhereTranslator {
+    private static final Logger logger = LoggerFactory.getLogger(ResqlResqlWhereTranslatorPostgres.class);
     private final ParseTreeProperty<ComputedObj> expressions = new ParseTreeProperty<>();
 
     public String chkAndExtractStr(ComputedObj o) {
@@ -102,8 +102,8 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
     public void exitNotlike(ResqlLangParser.NotlikeContext ctx) {
         logger.trace(ctx.getText());
         final StringBuilder sb = new StringBuilder();
-        if (!PgQueryWhereValidators.validateLikePattern(ctx.STRING().getText())) {
-            throw new ResqlParseException("Invalid Postgres NOT LIKE pattern");
+        if (!ResqlQueryWhereValidatorsPostgres.validateLikePattern(ctx.STRING().getText())) {
+            throw new DefaultResqlParseException("Invalid Postgres NOT LIKE pattern");
         }
         sb.append(ctx.FIELD()).append(" NOT LIKE ").append(ctx.STRING());
         expressions.put(ctx, StrWrapperBuilder(sb.toString()));
@@ -271,8 +271,8 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
     public void exitLike(ResqlLangParser.LikeContext ctx) {
         logger.trace(ctx.getText());
         final StringBuilder sb = new StringBuilder();
-        if (!PgQueryWhereValidators.validateLikePattern(ctx.STRING().getText())) {
-            throw new ResqlParseException("Invalid Postgres LIKE pattern");
+        if (!ResqlQueryWhereValidatorsPostgres.validateLikePattern(ctx.STRING().getText())) {
+            throw new DefaultResqlParseException("Invalid Postgres LIKE pattern");
         }
         sb.append(ctx.FIELD()).append(" LIKE ").append(ctx.STRING());
         expressions.put(ctx, StrWrapperBuilder(sb.toString()));

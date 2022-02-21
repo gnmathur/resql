@@ -1,6 +1,6 @@
 package com.gmathur.resql;
 
-import com.gmathur.resql.exceptions.ResqlParseException;
+import com.gmathur.resql.exceptions.DefaultResqlParseException;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
@@ -21,10 +21,10 @@ public class ResqlErrorListener extends BaseErrorListener {
                             int line,
                             int charPositionInLine,
                             String msg,
-                            RecognitionException e) throws ResqlParseException {
+                            RecognitionException e) throws DefaultResqlParseException {
         final String errMsg = "Error parsing input (line " + line + ":" + charPositionInLine + " " + msg + ")";
         LOGGER.error(errMsg);
-        throw new ResqlParseException(errMsg);
+        throw new DefaultResqlParseException(errMsg);
     }
 
     @Override
@@ -38,7 +38,7 @@ public class ResqlErrorListener extends BaseErrorListener {
         String text = recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex));
         final String errMsg = "Error parsing input (ambiguous " + text + ")";
         LOGGER.error(errMsg);
-        throw new ResqlParseException(errMsg);
+        throw new DefaultResqlParseException(errMsg);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class ResqlErrorListener extends BaseErrorListener {
         String text = recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex));
         final String errMsg = "Error parsing input (SLL conflict " + text + ")";
         LOGGER.error(errMsg);
-        throw new ResqlParseException(errMsg);
+        throw new DefaultResqlParseException(errMsg);
     }
 
     @Override

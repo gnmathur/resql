@@ -1,7 +1,7 @@
 package com.gmathur.resql.integration;
 
-import com.gmathur.resql.ResqlWhereBuilder;
-import com.gmathur.resql.ResqlWhereBuilderPg;
+import com.gmathur.resql.Resql;
+import com.gmathur.resql.translators.postgres.ResqlWhereProcessorPostgres;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -17,11 +17,16 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-// Expected values are inferred from the migration ABV0.2__init.sql
+/**
+ * Integration tests for resql with Postgres
+ *
+ * Note: Expected values are inferred from the migration ABV0.2__init.sql
+ *
+ * @author Gaurav Mathur (gnmathur)
+ */
 @Testcontainers
 public class PgTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(PgTest.class);
@@ -70,12 +75,23 @@ public class PgTest {
         }
     }
 
+    /**
+     * Helper to run the test cases. It takes care of creating the <B>ressql</B> instance for this target database,
+     * and processing the passed WHERE clause
+     *
+     * @param clause WHERE clause from the user
+     * @return A Set of film_id values from the film database that match the parsed where clause
+     *
+     * @throws SQLException
+     */
     private static Set<Integer> runTestWithFilmIdResults(final String clause) throws SQLException {
-        ResqlWhereBuilder w = new ResqlWhereBuilderPg();
-        String where = w.process(clause).orElseGet(() -> "false");
+        final Resql w = Resql.builder()
+                .withWhereBuilder(ResqlWhereProcessorPostgres.class)
+                .build();
+        final String where = w.process(clause).orElseGet(() -> "false");
         LOGGER.debug("Executing with where clause \"{}\"", where);
-        ResultSet rs = jdbcHandle.doQuery("select film_id from film where " + where);
-        Set<Integer> got = new HashSet<>();
+        final ResultSet rs = jdbcHandle.doQuery("select film_id from film where " + where);
+        final Set<Integer> got = new HashSet<>();
         while (rs.next()) {
             got.add(rs.getInt(1));
         }
