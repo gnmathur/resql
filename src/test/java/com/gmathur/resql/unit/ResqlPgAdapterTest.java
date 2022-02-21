@@ -1,8 +1,8 @@
 package com.gmathur.resql.unit;
 
-import com.gmathur.resql.ResqlWhereBuilder;
-import com.gmathur.resql.ResqlWhereBuilderPg;
-import com.gmathur.resql.exceptions.ResqlParseException;
+import com.gmathur.resql.translators.ResqlWhereProcessor;
+import com.gmathur.resql.translators.postgres.ResqlWhereProcessorPostgres;
+import com.gmathur.resql.exceptions.DefaultResqlParseException;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
@@ -12,10 +12,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ResqlPgAdapterTest {
-    private ResqlWhereBuilder w = new ResqlWhereBuilderPg();
+    private ResqlWhereProcessor w = new ResqlWhereProcessorPostgres();
 
     private void assertThrowsCheck(final String clause) {
-        assertThrows(ResqlParseException.class, () -> {
+        assertThrows(DefaultResqlParseException.class, () -> {
             final String restWhereArg = clause;
             final Optional<String> res1 = w.process(restWhereArg);
         });

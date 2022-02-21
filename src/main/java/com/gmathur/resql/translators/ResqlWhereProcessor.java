@@ -1,5 +1,7 @@
-package com.gmathur.resql;
+package com.gmathur.resql.translators;
 
+import com.gmathur.resql.ResqlLangLexer;
+import com.gmathur.resql.ResqlLangParser;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 
@@ -7,7 +9,13 @@ import java.util.Optional;
 
 import static com.gmathur.resql.ResqlErrorListener.RESQL_ERROR_LISTENER;
 
-public abstract class ResqlWhereBuilder {
+/**
+ * The Database-specific implementation for processing an input stream - parsing it and converting it into a
+ * Database-specific WHERE clause for the native query
+ *
+ * @author Gaurav Mathur (gnmathur)
+ */
+public abstract class ResqlWhereProcessor {
     abstract public Optional<String> process(final String input);
 
     protected static ParseTree parseTree(final String input) {

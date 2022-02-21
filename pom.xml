@@ -124,7 +124,7 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <id>ressql</id>
+                        <id>resql</id>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
