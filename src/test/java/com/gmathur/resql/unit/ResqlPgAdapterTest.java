@@ -237,5 +237,12 @@ public class ResqlPgAdapterTest {
             assertTrue(res.isPresent());
             assertEquals(expected, res.get());
         }
+        {
+            final String restWhereArg = "foo_bar = ''";
+            final String expected = "foo_bar = ''";
+            final Optional<String> res = w.process(restWhereArg);
+            assertTrue(res.isPresent());
+            assertEquals(expected, res.get());
+        }
     }
 }
