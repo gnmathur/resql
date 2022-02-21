@@ -106,14 +106,14 @@ public class PgTest {
 
     @Test
     public void strInTestWithAndClauses() throws SQLException {
-        final String clause = "rating IN['G', 'PG'] && film_id > 10 && film_id < 20";
+        final String clause = "rating ^['G', 'PG'] && film_id > 10 && film_id < 20";
         Set<Integer> expected = new HashSet<>(Arrays.asList(11, 12, 13, 19));
         assertEquals(expected, runTestWithFilmIdResults(clause));
     }
 
     @Test
     public void intInTestWithAndClauses() throws SQLException {
-        final String clause = "length IN[123, 124, 125, 127]";
+        final String clause = "length ^[123, 124, 125, 127]";
         final Set<Integer> expected = new HashSet<>(Arrays.asList(36, 95, 105, 145, 158));
         assertEquals(expected, runTestWithFilmIdResults(clause));
     }
@@ -137,5 +137,20 @@ public class PgTest {
         final String clause = "description !~ '%base%' && title  ~ '%MA_'";
         final Set<Integer> expected = new HashSet<>(Arrays.asList(94, 6));
         assertEquals(expected, runTestWithFilmIdResults(clause));
+    }
+
+    @Test
+    public void notInTest() throws SQLException {
+        {
+            final String clause = "rating !^['NC-17', 'R', 'PG-13', 'PG'] && rental_duration !^[4, 5, 6, 7]";
+            final Set<Integer> expected = new HashSet<>(Arrays.asList(2, 25, 26, 46, 50, 82, 109, 126, 156));
+            assertEquals(expected, runTestWithFilmIdResults(clause));
+        }
+        {
+            // Stress testing token recognition in clause with no spaces
+            final String clause = "rating!^['NC-17','R','PG-13','PG']&&rental_duration!^[4,5,6,7]";
+            final Set<Integer> expected = new HashSet<>(Arrays.asList(2, 25, 26, 46, 50, 82, 109, 126, 156));
+            assertEquals(expected, runTestWithFilmIdResults(clause));
+        }
     }
 }

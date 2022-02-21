@@ -8,7 +8,7 @@ subexp : OPENPAREN subexp CLOSEPAREN
         | subexp AND subexp
         | subexp OR subexp
         | gtexp | ltexp | gteexp | lteexp
-        | between | in
+        | between | in | notin
         | equal | notequal
         | like | notlike
         ;
@@ -18,9 +18,9 @@ gtexp       : FIELD GT  (NUMBER | STRING);
 // Field is less than a numeric or string value
 ltexp       : FIELD LT  (NUMBER | STRING);
 // Field is less than or equal to a numeric or string value
-lteexp      : FIELD GTE (NUMBER | STRING);
+lteexp      : FIELD LTE (NUMBER | STRING);
 // Field is greather than or equal to a numeric or string value
-gteexp      : FIELD LTE (NUMBER | STRING);
+gteexp      : FIELD GTE (NUMBER | STRING);
 // Field is equal to a numeric or string value
 equal       : FIELD EQ  (NUMBER | STRING);
 notequal    : FIELD NEQ (NUMBER | STRING);
@@ -28,6 +28,9 @@ notequal    : FIELD NEQ (NUMBER | STRING);
 between     : FIELD BTW tuple;
 // Field is one of the values in the range
 in          : FIELD IN (arrayN | arrayS);
+// Field is neither one of the values in the range
+notin       : FIELD NOTIN (arrayN | arrayS);
+
 // An array or a range of numbers
 arrayN      : SQOPEN NUMBER (SEP | NUMBER)* SQCLOSE;
 arrayS      : SQOPEN (SEP | STRING)* SQCLOSE;
@@ -75,14 +78,15 @@ fragment LOWERCASE      : [a-z];
 fragment QUOTE          : '\'';
 fragment UNDERSCORE     : '_';
 fragment EQUAL          : '=';
-fragment HYPHEN      : '-';
-fragment CARET       : '^';
-fragment PERCENT     : '%';
-fragment PERIOD      : '.';
-fragment STAR        : '*';
-fragment QUESTION    : '?';
-fragment DOLLAR      : '$';
-fragment PLUS        : '+';
+fragment HYPHEN         : '-';
+fragment CARET          : '^';
+fragment PERCENT        : '%';
+fragment PERIOD         : '.';
+fragment STAR           : '*';
+fragment QUESTION       : '?';
+fragment DOLLAR         : '$';
+fragment PLUS           : '+';
+fragment EXCL           : '!';
 
 // Tokens
 SEP         : ',';
@@ -105,11 +109,10 @@ MATCH       : '~'  ;  // match
 NEGMATCH    : '!~'  ;  // dont match
 
 // Logical operators - combine boolean expressions
-AND : '&&';
-OR  : '||';
-
-// Unary operators
-IN  : I N; // match an element in a defined range
+AND     : '&&';
+OR      : '||';
+IN      : CARET;
+NOTIN   : EXCL CARET;
 
 // Integer and floating point numbers
 NUMBER  : DIGIT+

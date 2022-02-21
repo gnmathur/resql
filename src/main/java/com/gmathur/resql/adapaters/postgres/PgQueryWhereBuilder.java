@@ -82,6 +82,8 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
             expressions.put(ctx, expressions.get(ctx.lteexp()));
         } else if (ctx.in() != null) {
             expressions.put(ctx, expressions.get(ctx.in()));
+        } else if (ctx.notin() != null) {
+            expressions.put(ctx, expressions.get(ctx.notin()));
         } else if (ctx.between() != null) {
             expressions.put(ctx, expressions.get(ctx.between()));
         } else if (ctx.like() != null) {
@@ -213,6 +215,20 @@ public class PgQueryWhereBuilder extends QueryWhereBuilder {
 
         ParseTree node = (ctx.arrayN() != null) ? ctx.arrayN() : ctx.arrayS();
         String inExp = ctx.FIELD().getText() + " IN " + chkAndExtractStr(expressions.get(node));
+        expressions.put(ctx, StrWrapperBuilder(inExp));
+    }
+
+    @Override
+    public void enterNotin(ResqlLangParser.NotinContext ctx) {
+
+    }
+
+    @Override
+    public void exitNotin(ResqlLangParser.NotinContext ctx) {
+        logger.trace(ctx.getText());
+
+        ParseTree node = (ctx.arrayN() != null) ? ctx.arrayN() : ctx.arrayS();
+        String inExp = ctx.FIELD().getText() + " NOT IN " + chkAndExtractStr(expressions.get(node));
         expressions.put(ctx, StrWrapperBuilder(inExp));
     }
 
