@@ -213,4 +213,36 @@ public class ResqlPgAdapterTest {
             assertEquals(expected, res.get());
         }
     }
+
+    @Test
+    public void testStringLiterals() {
+        {
+            final String restWhereArg = "foo_bar = '$avalue'";
+            final String expected = "foo_bar = '$avalue'";
+            final Optional<String> res = w.process(restWhereArg);
+            assertTrue(res.isPresent());
+            assertEquals(expected, res.get());
+        }
+        {
+            final String restWhereArg = "foo_bar = '$!@#$%^&*()+_[]{}abcd)(*&^%#@!$'";
+            final String expected= "foo_bar = '$!@#$%^&*()+_[]{}abcd)(*&^%#@!$'";
+            final Optional<String> res = w.process(restWhereArg);
+            assertTrue(res.isPresent());
+            assertEquals(expected, res.get());
+        }
+        {
+            final String restWhereArg = "foo_bar ~ '$avalue'";
+            final String expected = "foo_bar LIKE '$avalue'";
+            final Optional<String> res = w.process(restWhereArg);
+            assertTrue(res.isPresent());
+            assertEquals(expected, res.get());
+        }
+        {
+            final String restWhereArg = "foo_bar = ''";
+            final String expected = "foo_bar = ''";
+            final Optional<String> res = w.process(restWhereArg);
+            assertTrue(res.isPresent());
+            assertEquals(expected, res.get());
+        }
+    }
 }

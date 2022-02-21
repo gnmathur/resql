@@ -71,6 +71,7 @@ fragment W :('W'|'w');
 fragment X :('X'|'x');
 fragment Y :('Y'|'y');
 fragment Z :('Z'|'z');
+fragment StringLiteralFragment: ~['\r\n\\] | ('\\' .) ;
 
 fragment DIGIT          : [0-9];
 fragment UPPERCASE      : [A-Z];
@@ -87,6 +88,8 @@ fragment QUESTION       : '?';
 fragment DOLLAR         : '$';
 fragment PLUS           : '+';
 fragment EXCL           : '!';
+fragment AT             : '@';
+fragment AMPERSAND      : '&';
 
 // Tokens
 SEP         : ',';
@@ -116,12 +119,17 @@ NOTIN   : EXCL CARET;
 
 // Integer and floating point numbers
 NUMBER  : DIGIT+
-            | DIGIT+ '.' DIGIT+
-            ;
-// String identifiers
-STRING      : QUOTE
-            (UPPERCASE | LOWERCASE | DIGIT | HYPHEN | STAR | PERIOD | PLUS | CARET | PERCENT | EQUAL | GT | LT | UNDERSCORE)+
-            QUOTE;
-FIELD       : (UPPERCASE | LOWERCASE | DIGIT | UNDERSCORE )+;
+        | DIGIT+ '.' DIGIT+
+        ;
 
-WS      : [ \t\r\n]+ -> skip;
+// String literal
+STRING  : QUOTE StringLiteralFragment* QUOTE
+        ;
+
+// Where clause field literal
+FIELD   : (UPPERCASE | LOWERCASE | DIGIT | UNDERSCORE )+
+        ;
+
+// Skip whitespace
+WS      : [ \t\r\n]+ -> skip
+        ;
