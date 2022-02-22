@@ -1,6 +1,8 @@
 package com.gmathur.resql.integration;
 
 import com.gmathur.resql.Resql;
+import com.gmathur.resql.exceptions.ResqlException;
+import com.gmathur.resql.exceptions.ResqlExceptionHandler;
 import com.gmathur.resql.translators.postgres.ResqlWhereProcessorPostgres;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeAll;
@@ -30,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Testcontainers
 public class PgTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(PgTest.class);
+
     private static final String POSTGRES_USER = "resql";
     private static final String POSTGRES_PASSWORD = "resql";
     private static final String POSTGRES_DB = "resql";
