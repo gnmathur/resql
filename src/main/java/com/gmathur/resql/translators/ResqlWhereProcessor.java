@@ -1,13 +1,15 @@
 package com.gmathur.resql.translators;
 
+import com.gmathur.resql.ResqlErrorListener;
 import com.gmathur.resql.ResqlLangLexer;
 import com.gmathur.resql.ResqlLangParser;
+import com.gmathur.resql.exceptions.ResqlExceptionHandler;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
-
-import static com.gmathur.resql.ResqlErrorListener.RESQL_ERROR_LISTENER;
 
 /**
  * The Database-specific implementation for processing an input stream - parsing it and converting it into a
@@ -16,15 +18,23 @@ import static com.gmathur.resql.ResqlErrorListener.RESQL_ERROR_LISTENER;
  * @author Gaurav Mathur (gnmathur)
  */
 public abstract class ResqlWhereProcessor {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResqlWhereProcessor.class);
+
     abstract public Optional<String> process(final String input);
 
-    protected static ParseTree parseTree(final String input) {
+    private final ResqlExceptionHandler exceptionHandler;
+
+    public ResqlWhereProcessor(final ResqlExceptionHandler exceptionHandler) {
+        this.exceptionHandler = exceptionHandler;
+    }
+
+    protected ParseTree parseTree(final String input) {
         final CharStream charStream = CharStreams.fromString(input);
 
         // Lexer from byte stream
         ResqlLangLexer resqlLangLexer = new ResqlLangLexer(charStream);
         resqlLangLexer.removeErrorListeners();
-        resqlLangLexer.addErrorListener(RESQL_ERROR_LISTENER);
+        resqlLangLexer.addErrorListener(new ResqlErrorListener(exceptionHandler));
 
         // Extract Lexer tokens from Lexer
         final CommonTokenStream tokens = new CommonTokenStream(resqlLangLexer);
@@ -32,7 +42,7 @@ public abstract class ResqlWhereProcessor {
         // Create parser from the tokens
         ResqlLangParser resqlLangParser = new ResqlLangParser(tokens);
         resqlLangParser.removeErrorListeners();
-        resqlLangParser.addErrorListener(RESQL_ERROR_LISTENER);
+        resqlLangParser.addErrorListener(new ResqlErrorListener(exceptionHandler));
 
         // Parsed tree
         ParseTree tree = resqlLangParser.qexp();
