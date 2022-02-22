@@ -1,7 +1,10 @@
 package com.gmathur.resql;
 
+import com.gmathur.resql.exceptions.DefaultResqlExceptionHandler;
+import com.gmathur.resql.exceptions.ResqlException;
+import com.gmathur.resql.exceptions.ResqlExceptionHandler;
 import com.gmathur.resql.translators.ResqlWhereProcessor;
-import com.gmathur.resql.exceptions.DefaultResqlParseException;
+import com.gmathur.resql.exceptions.DefaultResqlException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
@@ -13,17 +16,10 @@ import java.util.Optional;
  */
 public class Resql {
     /// Class
-    private Class<? extends RuntimeException> exception;
-    private ResqlWhereProcessor resqlWhereProcessor;
+    private final ResqlWhereProcessor resqlWhereProcessor;
 
-    Resql(final Class<? extends RuntimeException> exception,
-          final ResqlWhereProcessor resqlWhereProcessor) {
-        this.exception = exception;
+    Resql(final ResqlWhereProcessor resqlWhereProcessor) {
         this.resqlWhereProcessor = resqlWhereProcessor;
-    }
-
-    public Class<? extends RuntimeException> getException() {
-        return exception;
     }
 
     public ResqlWhereProcessor getResqlWhereProcessor() {
@@ -41,15 +37,15 @@ public class Resql {
     /// Builder
 
     public static class ResqlBuilder {
-        private Class<? extends RuntimeException> exception;
+        private ResqlExceptionHandler exception;
         private Class<? extends ResqlWhereProcessor> resqlWhereProcessor = null;
 
         private ResqlBuilder() {
-            exception = DefaultResqlParseException.class;
+            exception = new DefaultResqlExceptionHandler();
         }
 
-        public ResqlBuilder withExceptionHandler(final Class<? extends RuntimeException> exception) {
-            this.exception = exception;
+        public ResqlBuilder withExceptionHandler(final ResqlExceptionHandler exceptionHandler) {
+            this.exception = exceptionHandler;
             return this;
         }
 
@@ -63,7 +59,11 @@ public class Resql {
                 throw new RuntimeException("resql needs a WHERE builder for the target database");
             }
             try {
-                return new Resql(exception, resqlWhereProcessor.getDeclaredConstructor().newInstance());
+                Class[] clsArgs = new Class[1];
+                clsArgs[0] = ResqlExceptionHandler.class;
+                return new Resql(resqlWhereProcessor
+                        .getDeclaredConstructor(clsArgs)
+                        .newInstance(exception));
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                 throw new RuntimeException("Error create resql instance (err: " + e.getMessage() + ")");
             }

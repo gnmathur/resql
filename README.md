@@ -1,10 +1,11 @@
 [![Java CI with Maven](https://github.com/gnmathur/resql/actions/workflows/maven.yml/badge.svg?branch=main)](https://github.com/gnmathur/resql/actions/workflows/maven.yml)
 
 # resql
-A Java library for translating custom query grammar into target DB where clauses
+`resql` defines a database-agnostic grammar to write query strings WHERE clauses. It also provides default translators for most common database to process the `resql` WHERE
+clause syntax into the target database WHERE clause syntax
 
 ## Feature
-* Provide a more succinct way to express query argument "where" clauses
+* Provide a more succinct way to express query argument _WHERE_ clauses
 * In-built syntactic and semantic checks. The query argument has a well-defined grammar enforcing the checks. Malformed queries can be indicated back to the user at the API layer itself.
 * Has multiple DB bindings including `Postgres`, `MongoDB`, and `MySQL`
 * Default and extensible safeguards to filter out unwanted queries. For example, the PG adapter has defaults to prevent queries that look like SQL injection
@@ -18,6 +19,55 @@ turns into,
 
 `localhost:8080/film?q=length%20%3E%20170%20%26%26%20rental_duration%20%3C%20%206%20%26%26%20film_id%20%3C%20201`
 
+## Usage
+### Add the `resql` dependency in the project
+
+```
+	<dependency>
+			<groupId>com.gnmathur</groupId>
+			<artifactId>resql</artifactId>
+			<version>0.1</version>
+	</dependency>
+```
+
+### (Optionally) create an exceptional condition handler
+_Sample:_
+```java
+    private static class MyException extends ResqlException {
+        public MyException(String message) {
+            super(message);
+        }
+    }
+
+    public static class MyExceptionHandler implements ResqlExceptionHandler {
+        @Override
+        public void report(String msg) throws ResqlException {
+            LOGGER.info(msg);
+            throw new MyException(msg);
+        }
+    }
+```
+
+### Create a `resql` context
+_Sample_
+```
+  final Resql w = Resql.builder()
+    .withExceptionHandler(new MyException())
+    .withWhereBuilder(ResqlWhereProcessorPostgres.class)
+    .build();
+```
+
+- `withExceptionHandler()` - a custom exceptional condition handler that can be used to report processing errors. This 
+is non-mandatory. If a custom exception is not specified, the default `DefaultResqlExceptionHandler` will be used.
+- `withWhereBuilder()` - one of the supplied database-specific WHERE clause builder. This is a mandatory
+argument.
+
+### Process a `resql` where input string
+_Parse_ and _translate_ a `resql` syntax __WHERE__ clause input string, and translate it into the target Database __WHERE__ clause
+
+```
+  final String where = w.process(clause).orElseGet(() -> "false");
+```
 
 ## Build
 
@@ -60,7 +110,7 @@ field <= 10
 ```bash
 field >= 10
 ```
-#### between >< (exclusive)
+#### between `><` (exclusive)
 ```bash
 field >< (1, 5)
 ```
@@ -92,12 +142,29 @@ field != 'foo'
 
 ## Logical Operators
 
-### In `IN`|`in`
+### Match `~`
 ```bash
-field IN[10, 11, 12]
-field IN["foo", "bar", "baz"]
+field ~'%foo_bar'
+field ~'%foo%'
 ```
 
+### Don't batch `!~`
+```bash
+field !~'%foo_bar'
+field !~'%foo%'
+```
+
+### In `^`
+```bash
+field ^[10, 11, 12]
+field ^["foo", "bar", "baz"]
+```
+
+### Not in `!^`
+```bash
+field !^[10, 11, 12]
+field !^["foo", "bar", "baz"]
+```
 ### 
 ### And `&&`
 ```bash
@@ -110,7 +177,7 @@ field1 EQ 10 OR field2 EQ 11
 field1 EQ 10 OR field3 EQ 'foo'
 ```
 
-### Parenthesis
+### Parenthesis 
 ```bash
 (field1 = 10 && field2 = 20) || (field3 = 30 && field4 = 40)
 ```

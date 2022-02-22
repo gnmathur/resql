@@ -1,9 +1,12 @@
 package com.gmathur.resql.unit;
 
-import com.gmathur.resql.translators.ResqlWhereProcessor;
+import com.gmathur.resql.Resql;
+import com.gmathur.resql.exceptions.ResqlException;
+import com.gmathur.resql.exceptions.ResqlExceptionHandler;
 import com.gmathur.resql.translators.postgres.ResqlWhereProcessorPostgres;
-import com.gmathur.resql.exceptions.DefaultResqlParseException;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
@@ -12,10 +15,31 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ResqlPgAdapterTest {
-    private ResqlWhereProcessor w = new ResqlWhereProcessorPostgres();
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResqlPgAdapterTest.class);
+
+    private static class ResqlPgAdapterTestException extends ResqlException {
+        public ResqlPgAdapterTestException(String message) {
+            super(message);
+        }
+    }
+
+    public static class TestParseException implements ResqlExceptionHandler {
+        private static final TestParseException INSTANCE = new TestParseException();
+
+        @Override
+        public void report(String msg) throws ResqlException {
+            LOGGER.info(msg);
+            throw new ResqlPgAdapterTestException(msg);
+        }
+    }
+
+    private final Resql w = Resql.builder()
+            .withExceptionHandler(TestParseException.INSTANCE)
+            .withWhereBuilder(ResqlWhereProcessorPostgres.class)
+            .build();
 
     private void assertThrowsCheck(final String clause) {
-        assertThrows(DefaultResqlParseException.class, () -> {
+        assertThrows(ResqlPgAdapterTestException.class, () -> {
             final String restWhereArg = clause;
             final Optional<String> res1 = w.process(restWhereArg);
         });
@@ -233,6 +257,13 @@ public class ResqlPgAdapterTest {
         {
             final String restWhereArg = "foo_bar ~ '$avalue'";
             final String expected = "foo_bar LIKE '$avalue'";
+            final Optional<String> res = w.process(restWhereArg);
+            assertTrue(res.isPresent());
+            assertEquals(expected, res.get());
+        }
+        {
+            final String restWhereArg = "foo_bar = ''";
+            final String expected = "foo_bar = ''";
             final Optional<String> res = w.process(restWhereArg);
             assertTrue(res.isPresent());
             assertEquals(expected, res.get());

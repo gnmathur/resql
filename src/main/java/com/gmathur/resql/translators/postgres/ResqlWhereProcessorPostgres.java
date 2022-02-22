@@ -1,5 +1,7 @@
 package com.gmathur.resql.translators.postgres;
 
+import com.gmathur.resql.exceptions.ResqlException;
+import com.gmathur.resql.exceptions.ResqlExceptionHandler;
 import com.gmathur.resql.translators.ResqlWhereProcessor;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -7,9 +9,17 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import java.util.Optional;
 
 public class ResqlWhereProcessorPostgres extends ResqlWhereProcessor {
+    private final ResqlExceptionHandler exceptionHandler;
+
+    public ResqlWhereProcessorPostgres(final ResqlExceptionHandler exceptionHandler) {
+        super(exceptionHandler);
+        this.exceptionHandler = exceptionHandler;
+    }
+
     public Optional<String> process(final String input) {
         final ParseTree parseTree = parseTree(input);
-        ResqlResqlWhereTranslatorPostgres resqlQueryWhereBuilderPostgres = new ResqlResqlWhereTranslatorPostgres();
+        ResqlResqlWhereTranslatorPostgres resqlQueryWhereBuilderPostgres =
+                new ResqlResqlWhereTranslatorPostgres(exceptionHandler);
 
         ParseTreeWalker.DEFAULT.walk(resqlQueryWhereBuilderPostgres, parseTree);
 
