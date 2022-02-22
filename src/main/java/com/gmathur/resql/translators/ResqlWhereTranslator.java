@@ -1,6 +1,8 @@
 package com.gmathur.resql.translators;
 
 import com.gmathur.resql.ResqlLangListener;
+import com.gmathur.resql.exceptions.ResqlException;
+import com.gmathur.resql.exceptions.ResqlExceptionHandler;
 
 import java.util.Optional;
 
@@ -14,6 +16,11 @@ import java.util.Optional;
  */
 public abstract class ResqlWhereTranslator implements ResqlLangListener {
     protected String where = null;
+    protected ResqlExceptionHandler exceptionHandler;
+
+    public ResqlWhereTranslator(final ResqlExceptionHandler resqlException) {
+        this.exceptionHandler = resqlException;
+    }
 
     /**
      * Return the result of the parse tree walk

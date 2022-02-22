@@ -1,8 +1,9 @@
 package com.gmathur.resql.translators.postgres;
 
 import com.gmathur.resql.ResqlLangParser;
+import com.gmathur.resql.exceptions.ResqlExceptionHandler;
 import com.gmathur.resql.translators.ResqlWhereTranslator;
-import com.gmathur.resql.exceptions.DefaultResqlParseException;
+import com.gmathur.resql.exceptions.DefaultResqlException;
 import com.gmathur.resql.models.ComputedObj;
 import com.gmathur.resql.models.ResqlListenerDataModels;
 import com.gmathur.resql.models.ResqlListenerDataModels.IntTuple;
@@ -17,19 +18,30 @@ import org.slf4j.LoggerFactory;
 import static com.gmathur.resql.models.ResqlListenerDataModels.IntTupleBuilder;
 import static com.gmathur.resql.models.ResqlListenerDataModels.StrWrapperBuilder;
 
+/**
+ * ANTLR listener implementation for Postgres for WHERE clause translation and a method to extract the translated where
+ * clause in the native (Postgres) Database
+ *
+ * @author Gaurav Mathur (gnmathur)
+ */
 public class ResqlResqlWhereTranslatorPostgres extends ResqlWhereTranslator {
     private static final Logger logger = LoggerFactory.getLogger(ResqlResqlWhereTranslatorPostgres.class);
     private final ParseTreeProperty<ComputedObj> expressions = new ParseTreeProperty<>();
 
+    public ResqlResqlWhereTranslatorPostgres(ResqlExceptionHandler resqlExceptionHandler) {
+        super(resqlExceptionHandler);
+    }
+
+    // Helper methods to perform some de
     public String chkAndExtractStr(ComputedObj o) {
         if (!(o instanceof ResqlListenerDataModels.StringWrapper)) {
-            throw new IllegalStateException("Expecting String but got " + o.getClass());
+            exceptionHandler.report("Expecting String but got " + o.getClass());
         }
         return ((ResqlListenerDataModels.StringWrapper) o).getS();
     }
     public IntTuple chkAndExtractTuple(ComputedObj o) {
         if (!(o instanceof IntTuple)) {
-            throw new IllegalStateException("Expecting String but got " + o.getClass());
+            exceptionHandler.report("Expecting Integer but got " + o.getClass());
         }
         return (IntTuple) o;
     }
@@ -103,7 +115,7 @@ public class ResqlResqlWhereTranslatorPostgres extends ResqlWhereTranslator {
         logger.trace(ctx.getText());
         final StringBuilder sb = new StringBuilder();
         if (!ResqlQueryWhereValidatorsPostgres.validateLikePattern(ctx.STRING().getText())) {
-            throw new DefaultResqlParseException("Invalid Postgres NOT LIKE pattern");
+            exceptionHandler.report("Invalid Postgres NOT LIKE pattern");
         }
         sb.append(ctx.FIELD()).append(" NOT LIKE ").append(ctx.STRING());
         expressions.put(ctx, StrWrapperBuilder(sb.toString()));
@@ -272,7 +284,7 @@ public class ResqlResqlWhereTranslatorPostgres extends ResqlWhereTranslator {
         logger.trace(ctx.getText());
         final StringBuilder sb = new StringBuilder();
         if (!ResqlQueryWhereValidatorsPostgres.validateLikePattern(ctx.STRING().getText())) {
-            throw new DefaultResqlParseException("Invalid Postgres LIKE pattern");
+            exceptionHandler.report("Invalid Postgres LIKE pattern");
         }
         sb.append(ctx.FIELD()).append(" LIKE ").append(ctx.STRING());
         expressions.put(ctx, StrWrapperBuilder(sb.toString()));
