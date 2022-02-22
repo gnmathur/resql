@@ -91,7 +91,7 @@ public class PgTest {
         final Resql w = Resql.builder()
                 .withWhereBuilder(ResqlWhereProcessorPostgres.class)
                 .build();
-        final String where = w.process(clause).orElseGet(() -> "false");
+        final String where = w.process(clause);
         LOGGER.debug("Executing with where clause \"{}\"", where);
         final ResultSet rs = jdbcHandle.doQuery("select film_id from film where " + where);
         final Set<Integer> got = new HashSet<>();

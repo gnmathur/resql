@@ -1,6 +1,6 @@
 package com.gmathur.resql.translators.postgres;
 
-import com.gmathur.resql.exceptions.ResqlException;
+import com.github.benmanes.caffeine.cache.Cache;
 import com.gmathur.resql.exceptions.ResqlExceptionHandler;
 import com.gmathur.resql.translators.ResqlWhereProcessor;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -13,6 +13,12 @@ public class ResqlWhereProcessorPostgres extends ResqlWhereProcessor {
 
     public ResqlWhereProcessorPostgres(final ResqlExceptionHandler exceptionHandler) {
         super(exceptionHandler);
+        this.exceptionHandler = exceptionHandler;
+    }
+
+    public ResqlWhereProcessorPostgres(ResqlExceptionHandler exceptionHandler,
+                                       Cache<Integer, String> cache) {
+        super(exceptionHandler, cache);
         this.exceptionHandler = exceptionHandler;
     }
 
