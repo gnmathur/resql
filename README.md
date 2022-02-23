@@ -52,7 +52,7 @@ _Sample:_
 _Sample_
 ```
   final Resql w = Resql.builder()
-    .withExceptionHandler(new MyException())
+    .withExceptionHandler(new MyExceptionHandler())
     .withWhereBuilder(ResqlWhereProcessorPostgres.class)
     .build();
 ```
