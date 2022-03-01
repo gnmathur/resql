@@ -61,7 +61,7 @@ _Parse_ and _translate_ a `resql` syntax __WHERE__ clause input string, and tran
 
 ## Usage - API Endpoint
 
-`resql` operators use a lot of the reserved characters as defined by RFC 3986. For REST controllers that leverage `resql`, the query parameters will have to be percent encoded. For example, a
+`resql` operators use a lot of the reserved characters as defined by RFC 3986. `resql` REST queries query parameter value will have to be percent encoded. For example, a
 REST GET request
 
 `localhost:8080/film?q=length > 170 && rental_duration <  6 && film_id < 201`
