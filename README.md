@@ -1,8 +1,7 @@
 [![Java CI with Maven](https://github.com/gnmathur/resql/actions/workflows/maven.yml/badge.svg?branch=main)](https://github.com/gnmathur/resql/actions/workflows/maven.yml)
 
 # resql
-`resql` defines a database-agnostic grammar to write query strings WHERE clauses. It also provides default translators for most common database to process the `resql` WHERE
-clause syntax into the target database WHERE clause syntax
+`resql` defines a database-agnostic grammar to write query strings WHERE clauses in REST GET query paramter. It provides default translators for most common database to process the `resql` WHERE clause syntax into the target database WHERE clause syntax
 
 ## Feature
 * Provide a more succinct way to express query argument _WHERE_ clauses
