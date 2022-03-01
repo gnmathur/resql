@@ -3,22 +3,13 @@
 # resql
 `resql` defines a database-agnostic grammar to write query strings WHERE clauses in REST GET query paramter. It provides default translators for most common database to process the `resql` WHERE clause syntax into the target database WHERE clause syntax
 
-## Feature
+## Features
 * Provide a more succinct way to express query argument _WHERE_ clauses
 * In-built syntactic and semantic checks. The query argument has a well-defined grammar enforcing the checks. Malformed queries can be indicated back to the user at the API layer itself.
 * Has multiple DB bindings including `Postgres`, `MongoDB`, and `MySQL`
 * Default and extensible safeguards to filter out unwanted queries. For example, the PG adapter has defaults to prevent queries that look like SQL injection
 
-`resql` operators use a lot of the reserved characters as defined by RFC 3986. For REST controllers that leverage `resql`, the query parameters will have to be percent encoded. For example, a
-REST GET request
-
-`localhost:8080/film?q=length > 170 && rental_duration <  6 && film_id < 201`
-
-turns into,
-
-`localhost:8080/film?q=length%20%3E%20170%20%26%26%20rental_duration%20%3C%20%206%20%26%26%20film_id%20%3C%20201`
-
-## Usage
+## Usage - Building with `resql`
 ### Add the `resql` dependency in the project
 
 ```
@@ -67,6 +58,17 @@ _Parse_ and _translate_ a `resql` syntax __WHERE__ clause input string, and tran
 ```
   final String where = w.process(clause).orElseGet(() -> "false");
 ```
+
+## Usage - API Endpoint
+
+`resql` operators use a lot of the reserved characters as defined by RFC 3986. For REST controllers that leverage `resql`, the query parameters will have to be percent encoded. For example, a
+REST GET request
+
+`localhost:8080/film?q=length > 170 && rental_duration <  6 && film_id < 201`
+
+turns into,
+
+`localhost:8080/film?q=length%20%3E%20170%20%26%26%20rental_duration%20%3C%20%206%20%26%26%20film_id%20%3C%20201`
 
 ## Build
 
