@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Gaurav Mathur (gnmathur)
  */
-public class Resql {
+public class Resql {//
     /// Class
     private final ResqlWhereProcessor resqlWhereProcessor;
     private Cache<Integer, String> cache = null;
